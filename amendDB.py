@@ -84,13 +84,14 @@ def delete_timeslot( appointmentid ):
 
 
 def add_appointment( userid, title, isflexible, iscomplete, notes, alert, invitees, location, start, end, hours, date ): 
+	print("called")
 	connection = sqlite3.connect("Planner.db") 
 	crsr = connection.cursor() 
 	command = "INSERT INTO Appointment (UserID, Title, isFlexible, isComplete, Notes, Alert, Invitees, Location) VALUES ( "
 	command += str(userid) + ", \"" + str(title) + "\", " + str(isflexible) 
 	command += ", " + str(iscomplete) + ", \"" + str(notes) + "\", " + str(alert) + ", " 
 	command += str(invitees) + ", \"" + str(location) + "\");"
-	#crsr.execute(command) 
+	crsr.execute(command) 
 	connection.commit() 
 	connection.close()
 
@@ -109,29 +110,42 @@ def add_appointment( userid, title, isflexible, iscomplete, notes, alert, invite
 		add_notflexible( rows[0][0], date, start, end )
 	# 	add_timeslot(sp.timeslotid, appointmentid, sp.starttime, sp.endtime)
 
+	print("done")
+
 
 def delete_appointment( appointmentid ): 
 	connection = sqlite3.connect("Planner.db") 
 	crsr = connection.cursor() 
 	command = "SELECT isflexible FROM Appointment WHERE AppointmentID = " + str(appointmentid) + ";"
-	isflexible = crsr.execute(command) 
+	crsr.execute(command) 
+	rows = crsr.fetchall()
+	isflexi = rows[0][0]
 	connection.commit() 
 	connection.close()
-	if isflexible == 0: 
+	#print(rows)
+	if isflexi == 0: 
 		delete_notflexible( appointmentid )
 	else:
 		delete_flexible( appointmentid )
 	delete_timeslot( appointmentid )
-	delete_appointment( appointmentid )
+	#delete_app( appointmentid )
+
+	command2 = "DELETE FROM Appointment WHERE AppointmentID = " + str(appointmentid) + ";"
+	connection2 = sqlite3.connect("Planner.db") 
+	crsr2 = connection2.cursor() 
+	crsr2.execute(command2) 
+	connection2.commit() 
+	connection2.close()
 
 
 
-#add_user( "Kanaee", "kans@gmail.com")
+#add_user( "Keya", "keya@gmail.com")
 #add_user( "Rhea", "rhea@gmail.com")
 #delete_user( 25 )
 
 #add_appointment( 2, "Adding Appointment", 1, 0, "Adding notes", 0, 1, "HKU", datetime.date(2020, 1, 15), datetime.date(2020, 1, 20), 10, 0)
 
+#delete_appointment( 2 )
 
 
 
