@@ -17,8 +17,8 @@ def add_flexible( appointmentid, startdate, enddate, noofhours ):
 	connection = sqlite3.connect("Planner.db") 
 	crsr = connection.cursor() 
 	command = "INSERT INTO Flexible (AppointmentID, StartDate, EndDate, NoOfHours) VALUES( "
-	command += str(appointmentid) + ", " + str(startdate)
-	command += ", " + str(enddate) + ", " + str(noofhours) + " );"
+	command += str(appointmentid) + ", \"" + str(startdate)
+	command += "\", \"" + str(enddate) + "\", " + str(noofhours) + " );"
 	crsr.execute(command)  
 	connection.commit() 
 	# close the connection 
@@ -30,20 +30,20 @@ def add_notflexible( appointmentid, date, starttime, endtime ):
 	# cursor  
 	crsr = connection.cursor() 
 	command = "INSERT INTO NotFlexible (AppointmentID, DateOfAppointment, StartTime, EndTime) VALUES( " 
-	command += str(appointmentid) + ", " + str(date) + ", "
+	command += str(appointmentid) + ", \"" + str(date) + "\", "
 	command += "\"" + str(starttime) + "\", \"" + str(endtime) + "\" );"
 	crsr.execute(command)  
 	connection.commit() 
 	# close the connection 
 	connection.close()
 
-def add_timeslot( appointmentid, starttime, endtime): 
+def add_timeslot( userid, appointmentid, starttime, endtime): 
 	# connecting to the database  
 	connection = sqlite3.connect("Planner.db") 
 	# cursor  
 	crsr = connection.cursor() 
-	command = "INSERT INTO TimeSlot (AppointmentID, StartTime, EndTime) VALUES( " 
-	command += str(appointmentid) + ", " 
+	command = "INSERT INTO TimeSlot (UserID, AppointmentID, StartTime, EndTime) VALUES( " 
+	command += str(userid) + ", " + str(appointmentid) + ", " 
 	command += "\"" + str(starttime) + "\", \"" + str(endtime) + "\" );"
 	crsr.execute(command)  
 	connection.commit() 
@@ -89,7 +89,7 @@ def add_appointment( userid, title, isflexible, iscomplete, notes, alert, invite
 	crsr = connection.cursor() 
 	command = "INSERT INTO Appointment (UserID, Title, isFlexible, isComplete, Notes, Alert, Invitees, Location) VALUES ( "
 	command += str(userid) + ", \"" + str(title) + "\", " + str(isflexible) 
-	command += ", " + str(iscomplete) + ", \"" + str(notes) + "\", " + str(alert) + ", " 
+	command += ", " + str(iscomplete) + ", \"" + str(notes) + "\", \"" + str(alert) + "\", " 
 	command += str(invitees) + ", \"" + str(location) + "\");"
 	crsr.execute(command) 
 	connection.commit() 
@@ -108,7 +108,7 @@ def add_appointment( userid, title, isflexible, iscomplete, notes, alert, invite
 		add_flexible( rows[0][0], start, end, hours )
 	else: #it is not flexible
 		add_notflexible( rows[0][0], date, start, end )
-	# 	add_timeslot(sp.timeslotid, appointmentid, sp.starttime, sp.endtime)
+		add_timeslot(userid, rows[0][0], start, end )
 
 	print("done")
 
@@ -139,13 +139,15 @@ def delete_appointment( appointmentid ):
 
 
 
-#add_user( "Keya", "keya@gmail.com")
-#add_user( "Rhea", "rhea@gmail.com")
-#delete_user( 25 )
+add_user( "Keya", "keya@gmail.com")
+add_user( "Rhea", "rhea@gmail.com")
+add_user( "Kanaee", "kanaee@gmail.com")
+add_appointment( 1, "Testing1", 0, 0, "testing datetime", datetime.datetime(2020, 1, 30, 14, 15, 0), 2, "ddun", 
+	datetime.time(14, 30, 0), datetime.time(15, 30, 0), 0, datetime.date(2020, 1, 30))
+add_appointment( 2, "Testing2", 1, 0, "testing datetime", datetime.datetime(2020, 1, 30, 14, 15, 0), 3, "bombay", 
+	datetime.date(2020, 1, 30), datetime.date(2020, 2, 14), 12, " ")
 
-#add_appointment( 2, "Adding Appointment", 1, 0, "Adding notes", 0, 1, "HKU", datetime.date(2020, 1, 15), datetime.date(2020, 1, 20), 10, 0)
 
-#delete_appointment( 2 )
 
 
 

@@ -20,7 +20,7 @@ Title VARCHAR(128),
 IsFlexible BIT, 
 isComplete BIT, 
 Notes VARCHAR(256), 
-Alert DATE, 
+Alert TEXT, 
 Invitees INTEGER, 
 Location VARCHAR(128), 
 FOREIGN KEY(UserID) REFERENCES User(UserID) )"""
@@ -28,17 +28,19 @@ FOREIGN KEY(UserID) REFERENCES User(UserID) )"""
 # SQL command to create a table in the database 
 sql_command_timeslot = """CREATE TABLE TimeSlot (  
 TimeSlotID INTEGER PRIMARY KEY, 
+UserID INTEGER, 
 AppointmentID INTEGER, 
-StartTime VARCHAR(128), 
-EndTime VARCHAR(128), 
+StartTime TEXT, 
+EndTime TEXT, 
+FOREIGN KEY(UserID) REFERENCES Appointment(UserID), 
 FOREIGN KEY(AppointmentID) REFERENCES Appointment(AppointmentID) )"""
 
 # SQL command to create a table in the database 
 sql_command_flexible = """CREATE TABLE Flexible (  
-FlexibleID INTEGER IDENTITY(1,1) PRIMARY KEY,
+FlexibleID INTEGER PRIMARY KEY,
 AppointmentID INTEGER, 
-StartDate DATE, 
-EndDate DATE, 
+StartDate TEXT, 
+EndDate TEXT, 
 NoOfHours int,  
 FOREIGN KEY(AppointmentID) REFERENCES Appointments(AppointmentID) )"""
 
@@ -46,19 +48,19 @@ FOREIGN KEY(AppointmentID) REFERENCES Appointments(AppointmentID) )"""
 sql_command_notflexible = """CREATE TABLE NotFlexible (  
 NotFlexibleID INTEGER PRIMARY KEY,
 AppointmentID INTEGER, 
-DateOfAppointment DATE, 
-StartTime VARCHAR(128), 
-EndTime VARCHAR(128),
+DateOfAppointment TEXT, 
+StartTime TEXT, 
+EndTime TEXT,
 FOREIGN KEY(AppointmentID) REFERENCES Appointments(AppointmentID) )"""
 
  
 # execute the statement 
 
-#crsr.execute(sql_command_user) 
-# crsr.execute(sql_command_appointment) 
-# crsr.execute(sql_command_timeslot) 
-# crsr.execute(sql_command_flexible) 
-# crsr.execute(sql_command_notflexible) 
+crsr.execute(sql_command_user) 
+crsr.execute(sql_command_appointment) 
+crsr.execute(sql_command_timeslot) 
+crsr.execute(sql_command_flexible) 
+crsr.execute(sql_command_notflexible) 
 
 connection.commit() 
 connection.close()
