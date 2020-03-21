@@ -3,6 +3,7 @@ import sortingfns
 import available_slots
 import datetime
 from datetime import timedelta
+import math
 #from datetime import datetime
 
 def add_user( username, email ): 
@@ -174,6 +175,7 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 	year = int(startDate.year)
 	print("year", year)
 	ts_from_db_array = array 
+	
 
 	for month in range(int(startDate.month), int(endDate.month)+1):
 		print ("Current Month: ", month) 
@@ -193,8 +195,11 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 			rangeStart = 1
 			rangeEnd = endDate.day
 
-		for day in range(rangeStart,rangeEnd+1):			
-			print("Current day: ", day) 
+		for day in range(rangeStart,rangeEnd+1):
+			hoursbooked = 0			
+
+			maxhours_inday = float(hours) / (float(rangeEnd) - float(rangeStart) + float(1.0))
+
 			all_available_slots = sortingfns.initslotarray()
 			array_for_ts_of_curr_day =[] 
 			curr_date_str = ""
@@ -206,11 +211,13 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 					array_for_ts_of_curr_day.append(ts_from_db_array[i])
 
 			for ts in array_for_ts_of_curr_day: 
-				starting = datetime.datetime.strptime(ts[4], '%H:%M:%S').time()
-				ending = datetime.datetime.strptime(ts[5], '%H:%M:%S').time()
-
+#				starting = datetime.datetime.strptime(ts[4], '%H:%M:%S').time()
+#				ending = datetime.datetime.strptime(ts[5], '%H:%M:%S').time()
+				starting = sortingfns.sroundoff( datetime.datetime.strptime(ts[4], '%H:%M:%S').time() )
+				ending = sortingfns.eroundoff( datetime.datetime.strptime(ts[5], '%H:%M:%S').time() )
 				start_ctr = 0 
 				end_ctr = 0 
+
 				for i in range(0, len(all_available_slots)): 
 					if( all_available_slots[i].startTime == starting): 
 						start_ctr = i
@@ -219,20 +226,27 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 
 				for i in range(start_ctr, end_ctr+1): 
 					all_available_slots[i].free = False
+
+				#Blocking 1 hour for lunch
+				all_available_slots[7].free = False
+				all_available_slots[8].free = False
 						
 			for i in range(0, len(all_available_slots)-1): 
 				if( all_available_slots[i].free == True and all_available_slots[i+1].free == True): 
 					all_available_slots[i].free = False
 					all_available_slots[i+1].free = False
-					if(remaining_hours >0): 
+					hoursbooked = hoursbooked + 1
+
+					if(remaining_hours > 0 and hoursbooked <= math.ceil(maxhours_inday)): 
 						add_timeslot( userid, appointmentid, datetime.date(year, month, day), (all_available_slots[i].startTime).strftime('%H:%M:%S'), (all_available_slots[i+1].endTime).strftime('%H:%M:%S'))
-					remaining_hours = remaining_hours - 1
+						remaining_hours = remaining_hours - 1
 
 			
-#add_appointment( 1, "New code test", 1, 0, "testing datetime", datetime.datetime(2020, 2, 17, 14, 15, 0), 3, "bombay", 
-	#datetime.date(2020, 2, 17), datetime.date(2020, 2, 20), 15, " ")
+add_appointment( 1, "New code test", 1, 0, "testing datetime", datetime.datetime(2020, 2, 17, 14, 15, 0), 3, "bombay", 
+	datetime.date(2020, 2, 17), datetime.date(2020, 2, 20), 15, " ")
 
-#for i in range(18, 37): 
-#delete_appointment(18)
+#for i in range(17, 30): 
+	#delete_appointment(i)
+#delete_appointment(32)
 
 
