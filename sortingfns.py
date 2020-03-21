@@ -2,6 +2,7 @@ import sqlite3
 import datetime
 import available_slots
 from datetime import timedelta
+import calendar 
 
 
 def selectionSort(array):
@@ -115,25 +116,70 @@ def initslotarray():
 			elif j == 1: 
 				start_mins = 30
 				end_mins = 0
-				obj = available_slots.DaySlot(datetime.time(i, start_mins, 0), datetime.time(i+1, end_mins, 0), True)
-			
-			# obj.startTime = datetime.time(i, start_mins, 0)
-			# obj.endTime = datetime.time(i, start_mins, 0)
-			# obj.free = True
+				obj = available_slots.DaySlot(datetime.time(i, start_mins, 0), datetime.time(i+1, end_mins, 0), True)			
 			a.append(obj)
-
-	# for i in range(0, len(a)): 
-	# 	print(a[i].startTime, a[i].endTime, a[i].free)
 	return a
 
+def sroundoff( startTime ):
+	#function to round down 
+	startTime_str = str(startTime)
+	hours = startTime_str[0:2]
+	mins = startTime_str[3:5]
+	secs = startTime_str[6:]
+	if(mins >= '00' and mins <'30' ):
+		startTime = datetime.time(int(hours), 0, 0)
+	else: 
+		startTime = datetime.time(int(hours), 30, 0)
+	return (startTime) 
+
+def eroundoff( endTime ): 
+	#function to round up
+	endTime_str = str(endTime)
+	hours = endTime_str[0:2]
+	mins = endTime_str[3:5]
+	secs = endTime_str[6:]
+	if(mins >'00' and mins <='30' ):
+		endTime = datetime.time(int(hours), 30, 0)
+	elif( mins >'30' and mins <='59') : 
+		endTime = datetime.time((int(hours)+1), 0, 0)
+	return(endTime)
 
 
+def countTotalDays( array, hours, userid, appointmentid, startDate, endDate ): 
+	daysinMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
+	remaining_hours = hours
+	year = int(startDate.year)
+	print("year", year)
+	if( calendar.isleap(year) ): 
+		daysinMonth[1] = 29
+	ts_from_db_array = array 
+	counter = 0 
+
+	for month in range(int(startDate.month), int(endDate.month)+1):
+		print ("Current Month: ", month) 
+		if (month == startDate.month) and (month == endDate.month) :
+			rangeStart = startDate.day
+			rangeEnd = endDate.day
+
+		elif (month == startDate.month) and (month < endDate.month) :
+			rangeStart = startDate.day
+			rangeEnd = daysinMonth[month-1]
+
+		elif (month > startDate.month) and (month < endDate.month):
+			rangeStart = 1
+			rangeEnd = daysinMonth[month-1]
+
+		elif (month > startDate.month) and (month == endDate.month):
+			rangeStart = 1
+			rangeEnd = endDate.day
 
 
+		for day in range(rangeStart,rangeEnd+1):
+			counter = counter + 1 
 
+	print( "counter", counter)
 
-
-
+	return counter 
 
 
 

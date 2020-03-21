@@ -4,6 +4,7 @@ import available_slots
 import datetime
 from datetime import timedelta
 import math
+import calendar
 #from datetime import datetime
 
 def add_user( username, email ): 
@@ -90,7 +91,6 @@ def delete_timeslot( appointmentid ):
 
 
 def add_appointment( userid, title, isflexible, iscomplete, notes, alert, invitees, location, start, end, hours, date ): 
-	#print("called")
 	connection = sqlite3.connect("Planner.db") 
 	crsr = connection.cursor() 
 	command = "INSERT INTO Appointment (UserID, Title, isFlexible, isComplete, Notes, Alert, Invitees, Location) VALUES ( "
@@ -169,11 +169,15 @@ def generate_timeslot( userid, appointmentid, start, end, hours):
 
 
 def get_slots(array, hours, userid, appointmentid, startDate, endDate):
+
+	totalNumOfDays = sortingfns.countTotalDays( array, hours, userid, appointmentid, startDate, endDate )
 	
 	daysinMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
 	remaining_hours = hours
 	year = int(startDate.year)
 	print("year", year)
+	if( calendar.isleap(year) ): 
+		daysinMonth[1] = 29
 	ts_from_db_array = array 
 	
 
@@ -195,11 +199,11 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 			rangeStart = 1
 			rangeEnd = endDate.day
 
+
 		for day in range(rangeStart,rangeEnd+1):
+			print("Day:", day)
 			hoursbooked = 0			
-
-			maxhours_inday = float(hours) / (float(rangeEnd) - float(rangeStart) + float(1.0))
-
+			maxhours_inday = float(hours) / float(totalNumOfDays) 
 			all_available_slots = sortingfns.initslotarray()
 			array_for_ts_of_curr_day =[] 
 			curr_date_str = ""
@@ -237,16 +241,31 @@ def get_slots(array, hours, userid, appointmentid, startDate, endDate):
 					all_available_slots[i+1].free = False
 					hoursbooked = hoursbooked + 1
 
+
 					if(remaining_hours > 0 and hoursbooked <= math.ceil(maxhours_inday)): 
 						add_timeslot( userid, appointmentid, datetime.date(year, month, day), (all_available_slots[i].startTime).strftime('%H:%M:%S'), (all_available_slots[i+1].endTime).strftime('%H:%M:%S'))
 						remaining_hours = remaining_hours - 1
 
 			
-add_appointment( 1, "New code test", 1, 0, "testing datetime", datetime.datetime(2020, 2, 17, 14, 15, 0), 3, "bombay", 
-	datetime.date(2020, 2, 17), datetime.date(2020, 2, 20), 15, " ")
+# add_appointment( 1, "New code test", 1, 0, "testing datetime", datetime.datetime(2020, 2, 17, 14, 15, 0), 3, "bombay", 
+# 	datetime.date(2020, 2, 17), datetime.date(2020, 2, 20), 15, " ")
+# add_appointment( 2, "Testcase1", 0, 1, "testing datetime", datetime.datetime(2020, 2, 28, 10, 30, 0), 3, "bombay", 
+# 	datetime.time(10, 25, 00),datetime.time(12, 45, 00), 2, datetime.date(2020, 2, 20))
+# add_appointment( 2, "Testcase1", 0, 1, "testing datetime", datetime.datetime(2020, 2, 28, 10, 30, 0), 3, "bombay", 
+# 	datetime.time(10, 25, 00),datetime.time(12, 45, 00), 2, datetime.date(2020, 2, 22))
+# add_appointment( 2, "Testcase1", 0, 1, "testing datetime", datetime.datetime(2020, 2, 28, 10, 30, 0), 3, "bombay", 
+# 	datetime.time(12, 45, 00),datetime.time(3, 10, 00), 3, datetime.date(2020, 2, 21))
+# add_appointment( 2, "Testcase1", 0, 1, "testing datetime", datetime.datetime(2020, 2, 28, 10, 30, 0), 3, "bombay", 
+# 	datetime.time(12, 45, 00),datetime.time(3, 10, 00), 3, datetime.date(2020, 2, 23))
 
-#for i in range(17, 30): 
+
+#add_appointment( 2, "Feb Testing", 1, 0, "testing datetime", datetime.datetime(2020, 2, 17, 14, 15, 0), 3, "bombay", 
+	#datetime.date(2020, 2, 25), datetime.date(2020, 3, 3), 25, " ")
+
+
+
+#for i in range(19, 29): 
 	#delete_appointment(i)
-#delete_appointment(32)
+#delete_appointment(35)
 
 
