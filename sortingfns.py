@@ -1,4 +1,4 @@
-import sqlite3
+
 import datetime
 import available_slots
 from datetime import timedelta
@@ -148,6 +148,8 @@ def eroundoff( endTime ):
 def countTotalDays( array, hours, userid, appointmentid, startDate, endDate ): 
 	daysinMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
 	remaining_hours = hours
+	startDate = strToDate(startDate)
+	endDate = strToDate(endDate)
 	year = int(startDate.year)
 	print("year", year)
 	if( calendar.isleap(year) ): 
@@ -181,6 +183,15 @@ def countTotalDays( array, hours, userid, appointmentid, startDate, endDate ):
 
 	return counter 
 
+
+def strToDate(date): 
+	yy = date[:4]
+	mm = date[5:7]
+	dd = date[8:]
+
+	print("dd", dd, "mm", mm, "yy", yy)
+
+	return( datetime.date(int(yy), int(mm), int(dd)) )
 
 
 	
